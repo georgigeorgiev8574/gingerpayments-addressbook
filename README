@@ -1,0 +1,67 @@
+Ginger Payments B.V. test documentation
+
+Create an address book
+Example:
+from gingerpayments.addressbook import addressbook
+abook = addressbook('book name')
+
+Add group
+addressbook.addgroup(groupname)
+Groupname should be unique, non-empty string. Returns groupname. Yeah, not very useful, 'True' is as useless.
+Examples:
+>>> abook.addgroup('group1')
+'group1'
+>>> abook.addgroup('group2')
+'group2'
+
+Add person
+addressbook.addperson(firstname, lastname, streetaddresses, emails, phones[, groups=[]])
+Firstname and lastname should be non-empty strings, all others should be non-empty strings or non-empty arrays of non-empty strings. Email strings should contain @ and dot(.). Phone strings should be in international format, i.e. start with +, have only digits and spaces afterwards, have a valid country code, and contain at most 15 digits. Returns person id.
+Array parameters example:
+>>> abook.addperson('john', 'smith', ['zip, city, street #', 'zip6, city6, street6 #6'],
+                    ['john@example.com','john2@example.com'],['+359 88 888 8888','+359 89 999 9999'],['group1','group2'])
+0
+String parameters example:
+>>> abook.addperson('james', 'jones', 'zip2, city2, street2 #2', 'james@example.com', '+359 87 777 7777','group1')
+1
+No group example:
+>>> abook.addperson('carter', 'brown', 'zip3, city3 street3 #3', 'brown@example.com', '+359 88 888 6666')
+2
+
+Find people by group
+addressbook.findpeoplebygroup(groupname):
+Groupname should be already added to the book, non-empty string. Returns list of people ids. Granted, not much to do with them currently :)
+Examples:
+>>> abook.findpeoplebygroup('group1')
+[0,1]
+>>> abook.findpeoplebygroup('group2')
+[0]
+
+Find groups
+addressbook.findgroups(personid)
+Personid should be an int and should exist in the book. Returns list of person's groups.
+Examples:
+>>> abook.findgroups(0)
+['group1','group2']
+>>> abook.findgroups(2)
+[]
+
+Find people by names
+addressbook.findpeoplebynames(self[, firstname=None][, lastname=None])
+Firstname and lastname should be strings or None. They should not both be None. Returns list of people ids.
+>>> abook.findpeoplebynames('carter',None)
+[2]
+>>> abook.findpeoplebynames(None,'jones')
+[1]
+>>> abook.findpeoplebynames('john','smith')
+[0]
+
+addressbook.findpeoplebyemail(self, emailprefix)
+Emailprefix should be a non-empty string. Returns list of people ids.
+Example:
+>>> abook.findpeoplebyemail('brown@example.com')
+[2]
+>>> abook.findpeoplebyemail('j')
+[0,1]
+
+Find person by email address substring. I can use the same naive findpeoplebyemail function with 'in' instead of 'startswith' and go from there. This https://pypi.python.org/pypi/pytst/ library looks promising, I will also test this http://code.activestate.com/recipes/117223-boyer-moore-horspool-string-searching/ and this https://pypi.python.org/pypi/ahocorasick/0.9 with real data to find out which is faster and more memory efficient in our case.
